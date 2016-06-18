@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="es-419">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="" <title>Sticky Footer Navbar Template for Bootstrap</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!--jquery UI-->
+    <link rel="stylesheet" href="css/jquery/jquery-ui.css">
+
+    <!-- Custom styles for this template -->
+    <link href="css/sticky-footer-navbar.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/app.css">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="js/ie-emulation-modes-warning.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" href="js/leaflet/leaflet.css" />
+</head>
+
+<body>
+    <script src="js\chartjs\Chart.min.js" type="text/javascript"></script>
+    <script src="js\leaflet\leaflet.js"></script>
+    <script src="js\leaflet\leaflet.ajax.min.js"></script>
+    <script type="text/javascript" src="http://maps.stamen.com/js/tile.stamen.js?v1.2.4"></script>
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+                <a class="navbar-brand" href="#">Prototipo</a>
+            </div>
+            <div id="navbar" class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="prototipo_todo.html">Inicio</a></li>
+                    <li><a href="acerca.html">Acerca</a></li>
+                    <li><a href="contacto.html">Contacto</a></li>
+                    <!--<li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Action</a></li>
+                            <li><a href="#">Another action</a></li>
+                            <li><a href="#">Something else here</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li class="dropdown-header">Nav header</li>
+                            <li><a href="#">Separated link</a></li>
+                            <li><a href="#">One more separated link</a></li>
+                        </ul>
+                    </li>-->
+                </ul>
+            </div>
+
+            <!--/.nav-collapse -->
+        </div>
+    </nav>
+
+    <!-- Begin page content -->
+    <div class="container">
+        <div class="page-header">
+            <h1>Mapa de Precipitación</h1>
+        </div>
+        <p class="lead">
+            Interporlacion de lluvia son datos de las <b>ultimas 24 horas</b>.
+        </p>
+        <p>
+            <span id="texto" class="label label-default"></span>
+        </p>
+        <div id="map" style="height: 400px">
+        </div>
+
+        <div id="accordion">
+            <h3>24 horas acumulado</h3>
+            <!--<div>-->
+            <table id="24-horas-precipitacion" class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Id_estacion</th>
+                        <th>Tipo</th>
+                        <th>Nombre</th>
+                        <th>Estado</th>
+                        <th>Precipitacion</th>
+                        <th>Clasificacion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <!--</div>-->
+            <h3>48 horas acumulado</h3>
+            <table id="48-horas-precipitacion" class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Id_estacion</th>
+                        <th>Tipo</th>
+                        <th>Nombre</th>
+                        <th>Estado</th>
+                        <th>Precipitacion</th>
+                        <th>Clasificacion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <h3>72 horas acumulado</h3>
+            <table id="72-horas-precipitacion" class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Id_estacion</th>
+                        <th>Tipo</th>
+                        <th>Nombre</th>
+                        <th>Estado</th>
+                        <th>Precipitacion</th>
+                        <th>Clasificacion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>Nivel del Agua</h1>
+        </div>
+        <p class="lead">
+        </p>
+
+        <div class="bs-example" data-example-id="table-within-panel">
+            <div class="panel panel-default">
+                <div class="panel-heading">Estaciones - Niveles de agua</div>
+                <div class="panel-body">
+                    <p> Estos datos son producto de la lectura de las estaciones cada 10 minutos, es importante aclarar que los valores de nivel de agua solo estan disponibles cada hora. Existen 4 colores; azul, amarillo, naranja y rojo, los cuales nos indican
+                        las diferentes clasificaciones de los niveles de agua por estacion.
+                    </p>
+                </div>
+                <table id="niveles_agua" class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Nombre</th>
+                            <th>Estado</th>
+                            <th>Corriente</th>
+                            <th>Cuenca</th>
+                            <th>Gasto</th>
+                            <th class="prevencion">Prevencion</th>
+                            <th class="alerta">Alerta</th>
+                            <th class="emergencia">Emergencia</th>
+                            <th>Nivel del agua</th>
+                            <th>Clasificacion</th>
+                            <th>Diferencia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-3 col1">
+                    <div class="form">
+                        <div class="form-group">
+                            <label for="estaciones">Nombre</label>
+                            <select id="estaciones" class="form-control">
+                                <option value="0000000G03">Platanar</option>
+                                <option value="000000GR03">Samaría</option>
+                                <option value="0000000G20">El Muelle</option>
+                                <option value="0000000G01">Gaviotas</option>
+                                <option value="000000GR02">Gonzalez</option>
+                                <option value="000000OXOL">Oxolotan</option>
+                                <option value="000000GR01">Porvenir</option>
+                                <option value="0000000G02">Pueblo Nuevo</option>
+                                <option value="000000GR06">Puyacatengo</option>
+                                <option value="000000GR04">San Joaquin</option>
+                                <option value="000000GR05">Tapijulapa</option>
+                                <option value="000000GR07">Teapa</option>
+                                <option value="0000000G09">Salto de Agua</option>
+                                <option value="0000000G08">Boca del Cerro</option>
+                                <option value="SPEDR27040">San Pedro</option>
+                                <option value="Macuspana">Macuspana</option> 
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="nivel-agua">Nivel del Agua</label>
+                            <input type="text" id="nivel-agua" class="form-control" placeholder="valor Nivel Agual">
+                        </div>
+                        <div class="form-group">
+                            <label>Gasto calculado</label>
+                            <p id="resultado-gasto"></p>
+                        </div>
+                        <button type="submit" id="btn-calcular" class="btn btn-default">Calcular</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p class="text-muted"></p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.3/Chart.min.js" type="text/javascript"></script>
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="js/jquery/jquery-1.12.2.min.js"></script>
+    <script src="js/jquery/jquery-ui.min.js"></script>
+    <script>
+        window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')
+    </script>
+    <script src="js/bootstrap/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="js/ie10-viewport-bug-workaround.js"></script>
+    <script type="text/javascript">
+        var map = L.map('map', {
+            center: [16.68882, -92.28516],
+            zoom: 7
+        });
+
+        var tileUrl = 'http://{s}.tile.thunderforest.com/Landscape/{z}/{x}/{y}.png'
+        var layerTerrain = new L.TileLayer(tileUrl, {
+            maxZoom: 15
+        }).addTo(map);
+
+        var layer = new L.StamenTileLayer("toner");
+        
+        var greenIcon = L.icon({
+            iconUrl: 'js/leaflet/images/update.png',
+            shadowUrl: 'js/leaflet/images/marker-shadow.png',
+            iconAnchor: [12, 41]
+        });
+
+        var geojsonLayerEstaciones = new L.GeoJSON.AJAX("estaciones_24hr.geojson", {
+            onEachFeature: function(feature, layer) {
+                if (feature.properties) {
+                    var popupString = '<div class="popup">';
+                    var id_estacion = null;
+                    for (var k in feature.properties) {
+                        var v = feature.properties[k];
+                        popupString += k + ': ' + v + '<br />';
+                        if (k == "id_estacion") {
+                            id_estacion = v;
+                            console.log(v);
+                        }else if (k == "cambio recientemente") {
+                            if (v == "si") {
+                                layer.options.icon = greenIcon;
+                            }
+                        }
+                    }
+                    popupString += '<div style="width:300px;heigth:300px;"><canvas id="myChart" style="width: 300px; height: 150px;"></canvas></div>'
+                    popupString += '<input type="button" id="myBtn" value="Grafica" id_estacion="' + id_estacion + '">';
+                    popupString += '</div>';
+                    layer.bindPopup(popupString, {
+                        minWidth: 300,
+                        // maxHeight: 200
+                    });
+                }
+            }
+        }).addTo(map);
+
+        var geojsonLayerCurvas = new L.GeoJSON.AJAX("corte_interpolacion_curvas.geojson", {
+            onEachFeature: function(feature, layer) {
+                if (feature.properties) {
+                    layer.setStyle({
+                        color: "black",
+                        weight: 2,
+                        dashArray: '3'
+                    });
+                    var popupString = '<div class="popup">';
+                    for (var k in feature.properties) {
+                        var v = feature.properties[k];
+                        popupString += k + ': ' + v + '<br />';
+                    }
+                    popupString += '</div>';
+                    layer.bindPopup(popupString, {
+                        maxHeight: 200
+                    });
+                }
+            }
+        }).addTo(map);
+
+        var imageUrlRender = "render_corte_interpolacion_24hr.png";
+        var imageBoundsRender = [
+            [14.532098, -94.139156],
+            [18.650965, -90.370214]
+        ];
+        var interpolacion = L.imageOverlay(imageUrlRender, imageBoundsRender, {
+            opacity: .80,
+            transparent: true
+        }).addTo(map);
+
+        var baseLayers = {
+            "Toner": layer,
+            "Terrain": layerTerrain
+        };
+
+        var overlayMaps = {
+            "Curvas pmm": geojsonLayerCurvas,
+            "Estaciones": geojsonLayerEstaciones,
+            "interpolacion": interpolacion
+        };
+
+        L.control.layers(baseLayers, overlayMaps).addTo(map);
+
+        function grafica(id_estacion, fechas, precipitaciones) {
+            var data = {
+                labels: fechas,
+                datasets: [{
+                    label: "Precipitacion ultimas 24 horas",
+                    fill: false,
+                    lineTension: 0.1,
+                    backgroundColor: "rgba(75,192,192,0.4)",
+                    borderColor: "rgba(75,192,192,1)",
+                    borderCapStyle: 'butt',
+                    borderDash: [],
+                    borderDashOffset: 0.0,
+                    borderJoinStyle: 'miter',
+                    pointBorderColor: "rgba(75,192,192,1)",
+                    pointBackgroundColor: "#fff",
+                    pointBorderWidth: 1,
+                    pointHoverRadius: 5,
+                    pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                    pointHoverBorderColor: "rgba(220,220,220,1)",
+                    pointHoverBorderWidth: 2,
+                    pointRadius: 1,
+                    pointHitRadius: 10,
+                    data: precipitaciones,
+                }]
+            };
+
+            var ctx = document.getElementById("myChart");
+            var myChart = new Chart(ctx, {
+                // type: 'line',
+                type: 'bar',
+                data: data,
+                options: {
+                    scales: {
+                        xAxes: [{
+                            ticks: {
+                                display: false,
+                                minRotation: 90,
+                            }
+                        }]
+                    }
+
+                }
+            });
+        }
+
+        $("body").on('click', '#myBtn', function(e) {
+            e.preventDefault();
+            var btn = $("#myBtn")
+            var id_estacion_btn = btn.attr("id_estacion");
+            $.getJSON("estaciones_24hr.json", function(json) {
+                console.log("inicio");
+                for (var i = 0; i < json.length; i++) {
+                    var r = json[i];
+                    console.log(r);
+                    var fechas = r["fechas"];
+                    var precipitaciones = r["precipitaciones"];
+                    var id_estacion = r["id_estacion"];
+                    if (id_estacion_btn == id_estacion) {
+
+                        grafica(id_estacion, fechas, precipitaciones);
+                        break;
+                    }
+
+
+                }
+                console.log("fin");
+            });
+        });
+
+        // L.control.layers(null, overlayMaps).addTo(map);
+
+        // var imageUrlRender = "render_interpolacion_24_hr_10_colores.png";
+        // var imageBoundsRender = [[14.532098,-94.139156],[18.650965,-90.370214]];
+        // L.imageOverlay(imageUrlRender,imageBoundsRender,{opacity:.80,transparent: true}).addTo(map); 
+
+        // var imageUrlRender = "render.png";
+        // var imageBoundsRender = [[14.532098,-94.139156],[18.650965,-90.370214]];
+        // L.imageOverlay(imageUrlRender,imageBoundsRender,{opacity:.80,transparent: true}).addTo(map);
+
+        // var imageUrl = "render_interpolacion_24hr.png";
+        // var imageBounds = [[14.161685,-94.557289],[18.954288,-90.351032]];
+        // L.imageOverlay(imageUrl,imageBounds,{opacity:0.5,transparent: true}).addTo(map);
+    </script>
+    <script>
+        $(function() {
+             $.get('fecha.txt', function(data) {
+                $('#texto').html(data);
+            });
+            
+            function cargar_precipitaciones(archJson, tabla) {
+                $.getJSON(archJson, function(json) {
+                    for (var i = 0; i < json.length; i++) {
+                        var r = json[i];
+                        var tr = $("<tr />")
+                        tr.appendTo($(tabla));
+                        var th = $('<th scope="row"></th>');
+                        th.text(i + 1);
+                        th.appendTo(tr);
+                        var columnas = ["id_estacion", "tipo", "nombre", "estado", "precipitacion", "clasificacion"];
+                        for (c in columnas) {
+                            var columna = columnas[c];
+                            // console.log(r[columna]);
+                            var td = $("<td></td>");
+
+                            if (c == 5) {
+                                if (r[columna] == "lluvias aisladas") {
+                                    td.attr("class", "lluvias_aisladas");
+                                } else if (r[columna] == "chubascos con tormenta fuertes") {
+                                    td.attr("class", "chubascos_tormenta_fuertes");
+                                } else if (r[columna] == "chubascos con tormenta fuertes muy fuertes") {
+                                    td.attr("class", "chubascos_tormenta_fuertes_muy_fuertes");
+                                } else if (r[columna] == "tormentas intensas") {
+                                    td.attr("class", "tormentas_intensas");
+                                } else if (r[columna] == "torrenciales") {
+                                    td.attr("class", "torrenciales");
+                                } else if (r[columna] == "extraordinarios") {
+                                    td.attr("class", "extraordinarios");
+                                }
+                            } else if (c == 4) {
+                                var numero = r[columna];
+                                r[columna] = numero.toFixed(2);
+
+                            }
+                            td.text(r[columna]);
+                            td.appendTo(tr);
+                        }
+                    }
+                });
+            }
+
+            // function myTimer() {
+            //     $("#24-horas-precipitacion tbody").text("");
+            //     $("#48-horas-precipitacion tbody").text("");
+            //     $("#72-horas-precipitacion tbody").text("");
+
+            //     cargar_precipitaciones("preciptacion_24_estandar.json", "#24-horas-precipitacion tbody");
+            //     cargar_precipitaciones("preciptacion_48_estandar.json", "#48-horas-precipitacion tbody");
+            //     cargar_precipitaciones("preciptacion_72_estandar.json", "#72-horas-precipitacion tbody");
+            // }
+
+            // var minute = 60 * 1000;
+            // var myVar = setInterval(myTimer, 1 * minute);
+
+            cargar_precipitaciones("preciptacion_24_estandar.json", "#24-horas-precipitacion tbody");
+            cargar_precipitaciones("preciptacion_48_estandar.json", "#48-horas-precipitacion tbody");
+            cargar_precipitaciones("preciptacion_72_estandar.json", "#72-horas-precipitacion tbody");
+
+            // $.getJSON("preciptacion_24_estandar.json", function(json) {
+            //     for (var i = 0; i < json.length; i++) {
+            //         var r = json[i];
+            //         var tr = $("<tr />")
+            //         tr.appendTo($("#24-horas-precipitacion tbody"));
+            //         var th = $('<th scope="row"></th>');
+            //         th.text(i + 1);
+            //         th.appendTo(tr);
+            //         var columnas = ["id_estacion", "tipo", "nombre", "estado", "precipitacion", "clasificacion"];
+            //         for (c in columnas) {
+            //             var columna = columnas[c];
+            //             // console.log(r[columna]);
+            //             var td = $("<td></td>");
+
+            //             if (c == 5) {
+
+            //             }
+            //             td.text(r[columna]);
+            //             td.appendTo(tr);
+            //         }
+            //     }
+            // });
+            
+            $("#accordion").accordion({
+                collapsible: true,
+                active: false
+            });
+
+            function calcularGasto(id_estacion, nivel) {
+                if (id_estacion == "000000GR03") {
+                    return Math.round((171.79 * Math.pow(nivel, 2)) - (4222.5 * nivel) + 26050)
+                } else if (id_estacion == "000000OXOL") {
+                    return Math.round((72.158 * Math.pow(nivel, 2)) - (4830.5 * nivel) + 80819)
+                } else if (id_estacion == "000000GR06") {
+                    return Math.round((61.338 * Math.pow(nivel, 2)) - (3008.7 * nivel) + 36882)
+                } else if (id_estacion == "000000GR05") {
+                    return Math.round((44.46 * Math.pow(nivel, 2)) - (1452.2 * nivel) + 11879)
+                } else if (id_estacion == "000000GR04") {
+                    return Math.round((8.5467 * Math.pow(nivel, 2)) - (312.84 * nivel) + 2867.6)
+                } else if (id_estacion == "000000GR07") {
+                    return Math.round((66.093 * Math.pow(nivel, 2)) - (4528.1 * nivel) + 77567)
+                } else if (id_estacion == "000000GR02") {
+                    return Math.round((5.9531 * Math.pow(nivel, 2)) + (57.973 * nivel) - 228.92)
+                } else if (id_estacion == "0000000G02") {
+                    return Math.round((17.697 * Math.pow(nivel, 2)) - (70.32 * nivel) + 125.08)
+                } else if (id_estacion == "0000000G01") {
+                    return Math.round((20.054 * Math.pow(nivel, 2)) + (20.72 * nivel) - 1.5857)
+                } else if (id_estacion == "000000GR01") {
+                    return Math.round((33.434 * Math.pow(nivel, 2)) + (7.3098 * nivel) + 272.53)
+                } else if (id_estacion == "0000000G09") {
+                    return Math.round((3.44 * Math.pow(nivel, 2)) + (11.741 * nivel) + 5.7261)
+                } else if (id_estacion == "0000000G08") {
+                    return Math.round((16.632 * Math.pow(nivel, 2)) + (21.216 * nivel) - 1699.3)
+                } else if (id_estacion == "SPEDR27040") {
+                    return Math.round((-124.31 * Math.pow(nivel, 2)) + (2623.5 * nivel) - 13223)
+                } else if (id_estacion == "Macuspana") {
+                    return Math.round((3.44 * Math.pow(nivel, 2)) + (11.741 * nivel) + 5.7261)
+                } else {
+                    return "No existe funcion para calcular gasto"
+                }
+
+            }
+
+            $("#btn-calcular").on("click", function() {
+                var id_estacion = $("#estaciones option:selected").val();
+                var nivel = $("#nivel-agua").val();
+                console.log(id_estacion + " " + nivel);
+
+                $("#resultado-gasto").text(calcularGasto(id_estacion, nivel));
+            });
+
+            $.getJSON("niveles_agua_estaciones.json", function(json) {
+                for (var i = 0; i < json.length; i++) {
+                    var r = json[i];
+                    var tr = $("<tr />")
+                    tr.appendTo($("#niveles_agua tbody"));
+                    var th = $('<th scope="row"></th>');
+                    th.text(i + 1);
+                    th.appendTo(tr);
+                    var columnas = ["nombre", "estado", "corriente", "cuenca", "gasto", "prevencion", "alerta", "emergencia", "nivel_agua", "clasificacion", "diferencia"];
+                    for (c in columnas) {
+                        var columna = columnas[c];
+                        // console.log(r[columna]);
+                        var td = $("<td></td>");
+
+                        if (c == 3) {
+                            console.log(r[columna]);
+                            if (r[columna] == "Río González") {
+                                td.attr("class", "cuenca_gonzales");
+                            } else if (r[columna] == "Río Grijalva") {
+                                td.attr("class", "cuenca_grijalva");
+                            } else if (r[columna] == "Río Tulijá") {
+                                td.attr("class", "cuenca_tulija");
+                            } else if (r[columna] == "Río Usumacinta") {
+                                td.attr("class", "cuenca_usumacinta");
+                            }
+                        } else if (c == 9) {
+                            if (r[columna] == "normal") {
+                                td.attr("class", "normal");
+                            } else if (r[columna] == "prevencion") {
+                                td.attr("class", "prevencion");
+                            } else if (r[columna] == "alerta") {
+                                td.attr("class", "alerta");
+                            } else if (r[columna] == "emergencia") {
+                                td.attr("class", "emergencia");
+                            }
+                        } else if (c == 10) {
+                            var numero = r[columna];
+                            r[columna] = numero.toFixed(2);
+
+                        }
+                        td.text(r[columna]);
+                        td.appendTo(tr);
+                    }
+                }
+            });
+            
+            function cargarDeNuero() {
+                location.reload();
+            }
+            var minute = 60 * 1000;
+            var myVar = setInterval(cargarDeNuero, 5 * minute);
+        })
+    </script>
+</body>
+
+</html>

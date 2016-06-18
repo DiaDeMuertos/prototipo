@@ -1,0 +1,73 @@
+p {
+    text-align: justify;
+}
+
+td,
+th {
+    text-align: center;
+}
+
+tr:hover {
+    /*background-color: yellow;*/
+    background-color: #bfd3e6;
+}
+
+.prevencion {
+    background-color: #ffeda0;
+}
+
+.alerta {
+    background-color: #feb24c;
+}
+
+.emergencia {
+    background-color: #f03b20;
+}
+
+.normal {
+    background-color: #deebf7;
+}
+
+.cuenca_gonzales {
+    background-color: #a6611a;
+}
+
+.cuenca_grijalva {
+    background-color: #dfc27d;
+}
+
+.cuenca_tulija {
+    background-color: #80cdc1;
+}
+
+.cuenca_usumacinta {
+    background-color: #018571;
+}
+
+#resultado-gasto {
+    font-size: 15px;
+}
+
+.lluvias_aisladas {
+    background-color: #eff3ff;
+}
+
+.chubascos_tormenta_fuertes {
+    background-color: #c6dbef;
+}
+
+.chubascos_tormenta_fuertes_muy_fuertes {
+    background-color: #9ecae1;
+}
+
+.tormentas_intensas {
+    background-color: #6baed6;
+}
+
+.torrenciales {
+    background-color: #3182bd;
+}
+
+.extraordinarios {
+    background-color: #08519c;
+}

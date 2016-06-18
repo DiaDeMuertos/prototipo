@@ -1,0 +1,39 @@
+<?xml version="1.0" standalone="yes"?>
+<DcpDataWeb xmlns="http://tempuri.org/DcpDataWeb.xml">
+  <Dcp>
+    <FH>17/06/2016</FH>
+    <NV>17/06/2016 18:50:00  -   25.14 m</NV>
+    <PNE>17/06/2016 18:50:00  -   0.0 mm</PNE>
+    <TA>17/06/2016 18:00:00  -   32.31 °C</TA>
+    <HR>17/06/2016 18:00:00  -   64 %</HR>
+    <VD>17/06/2016 18:00:00  -   97 Grados</VD>
+    <VV>17/06/2016 18:00:00  -   1.1 Km/h</VV>
+    <VB>17/06/2016 18:00:00  -   12.98 V</VB>
+    <VR>17/06/2016 18:00:00  -   6.3 Km/h</VR>
+    <DR>17/06/2016 18:00:00  -   53 Grados</DR>
+    <NV1>17/06/2016 18:50:00  -   [5] m</NV1>
+    <TI>17/06/2016 18:50:00  -   64 dB</TI>
+    <VC>17/06/2016 18:50:00  -   [5] m/s</VC>
+    <VB2>17/06/2016 18:00:00  -   [10] dB</VB2>
+    <NVS>[Máxima: 25.14, 17/14:00][Mínima: 25.10, 17/00:30][Promedio: 25.12] m</NVS>
+    <PNES>De 08:00/16 a 08:00/17: 1.30 mm 
+De 08:00/17 a 18:50/17: 0.20 mm 
+Ultimas 24 hr: 1.50 mm 
+Ultimas 12 hr: 0.20 mm 
+Ultimas 06 hr: 0.10 mm 
+Ultimas 03 hr: 0.00 mm 
+Ultimas 01 hr: 0.00 mm 
+</PNES>
+    <TAS>[Máxima: 34.24, 16/18:00][Mínima: 24.27, 17/07:00][Promedio: 28.94] °C</TAS>
+    <HRS>[Promedio: 77.28] %</HRS>
+    <VDS>[Promedio: 155.44] Grados</VDS>
+    <VVS>[Máxima: 3.10, 17/01:00][Promedio: 0.93] Km/h</VVS>
+    <VBS>[Máxima: 13.91, 17/12:00][Mínima: 12.68, 17/07:00][Promedio: 13.10] V</VBS>
+    <VRS>[Máxima: 19.00, 17/01:00][Promedio: 5.24] Km/h</VRS>
+    <DRS>[Promedio: 128.20] Grados</DRS>
+    <NV1S>[Promedio: 0.00] m</NV1S>
+    <TIS>[Máxima: 69.00, 17/05:10][Promedio: 62.97] dB</TIS>
+    <VCS>[Promedio: 0.00] m/s</VCS>
+    <VB2S>[Promedio: 0.00] dB</VB2S>
+  </Dcp>
+</DcpDataWeb>
