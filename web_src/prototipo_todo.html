@@ -84,7 +84,7 @@
             <h1>Mapa de Precipitación</h1>
         </div>
         <p class="lead">
-            Interporlacion de lluvia son datos de las <b>ultimas 24 horas</b>.
+            Lluvia acumulada de 24 horas, tiempo real. <b>Iniciando 8:00 am</b>.
         </p>
         <p>
             <span id="texto" class="label label-default"></span>
@@ -93,6 +93,22 @@
         </div>
 
         <div id="accordion">
+            <h3>24 horas tiempo real</h3>
+            <table id="24-horas-tiempo-real" class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Id_estacion</th>
+                        <th>Tipo</th>
+                        <th>Nombre</th>
+                        <th>Estado</th>
+                        <th>Precipitacion</th>
+                        <th>Clasificacion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
             <h3>24 horas acumulado</h3>
             <!--<div>-->
             <table id="24-horas-precipitacion" class="table">
@@ -265,7 +281,9 @@
                 if (feature.properties) {
                     var popupString = '<div class="popup">';
                     var id_estacion = null;
-                    for (var k in feature.properties) {
+                    var columnas = ["id_estacion", "tipo", "nombre", "estado", "precipitacion", "clasificacion","cambio recientemente"];
+                    for (var c in columnas) {
+                        var k = columnas[c];
                         var v = feature.properties[k];
                         popupString += k + ': ' + v + '<br />';
                         if (k == "id_estacion") {
@@ -390,12 +408,9 @@
                     var precipitaciones = r["precipitaciones"];
                     var id_estacion = r["id_estacion"];
                     if (id_estacion_btn == id_estacion) {
-
                         grafica(id_estacion, fechas, precipitaciones);
                         break;
                     }
-
-
                 }
                 console.log("fin");
             });
@@ -475,6 +490,7 @@
             // var minute = 60 * 1000;
             // var myVar = setInterval(myTimer, 1 * minute);
 
+            cargar_precipitaciones("estaciones_24hr.json", "#24-horas-tiempo-real tbody");    
             cargar_precipitaciones("preciptacion_24_estandar.json", "#24-horas-precipitacion tbody");
             cargar_precipitaciones("preciptacion_48_estandar.json", "#48-horas-precipitacion tbody");
             cargar_precipitaciones("preciptacion_72_estandar.json", "#72-horas-precipitacion tbody");

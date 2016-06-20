@@ -58,7 +58,7 @@ def cambioRecientemente(menosDiez,fechas):
             return "si"
     return "no"
 
-def crearGeoJsonPrecipitacion():
+def crearGeoJsonPrecipitacion(final):
     query = """
             SELECT 
             id_estacion,
@@ -74,12 +74,21 @@ def crearGeoJsonPrecipitacion():
                     WHEN SUM(precipitacion)>=250.1 THEN 'extraordinarios' 
             END AS clasificacion,
             cambioRecientementeSqlite(DATETIME('now','-5 hours','-30 minutes'),GROUP_CONCAT(fecha_hora_precipitacion)) AS cambioRecientemente,
-            AsGeoJSON(geom) AS geom_json
+            AsGeoJSON(geom) AS geom_json,
+            CASE 
+                WHEN SUM(precipitacion)>= 0.1 AND SUM(precipitacion)<25.1 THEN 1
+                WHEN SUM(precipitacion)>= 25.1 AND SUM(precipitacion)<50.1 THEN 2
+                WHEN SUM(precipitacion)>= 50.1 AND SUM(precipitacion)<75.1 THEN 3
+                WHEN SUM(precipitacion)>= 75.1 AND SUM(precipitacion)<150.1 THEN 4
+                WHEN SUM(precipitacion)>= 150.1 AND SUM(precipitacion)<250.1 THEN 5
+                WHEN SUM(precipitacion)>=250.1 THEN 6
+                END AS posicion
             FROM estaciones
             INNER JOIN datos_estaciones
             ON estaciones.id = datos_estaciones.id_fk
-            WHERE datos_estaciones.precipitacion>0 AND estaciones.geom IS NOT NULL AND DATETIME("fecha_hora_precipitacion")>=DATETIME('now','-29 hours')
-            GROUP BY estaciones.id_estacion"""
+            WHERE datos_estaciones.precipitacion>0 AND estaciones.geom IS NOT NULL AND DATETIME("fecha_hora_precipitacion")>=DATETIME('{final}')
+            GROUP BY estaciones.id_estacion
+            ORDER BY posicion DESC,precipitacion DESC""".format(final=final)
         
     try:
         with db.connect(bDatosPath) as con:
@@ -112,7 +121,7 @@ def crearGeoJsonPrecipitacion():
     except db.Error, e:
         print "Error %s:" % e.args[0]
 
-def crearJsonPrecipitacion():
+def crearJsonPrecipitacion(final):
     query = """
             SELECT id_estacion,tipo,nombre,estado,SUM(precipitacion) AS precipitacion_24hr ,
                 CASE 
@@ -124,16 +133,25 @@ def crearJsonPrecipitacion():
                         WHEN SUM(precipitacion)>=250.1 THEN 'extraordinarios' 
                 END AS clasificacion,
                 GROUP_CONCAT(fecha_hora_precipitacion) AS fechas,
-                GROUP_CONCAT(precipitacion) AS precipitaciones
+                GROUP_CONCAT(precipitacion) AS precipitaciones,
+                CASE 
+                    WHEN SUM(precipitacion)>= 0.1 AND SUM(precipitacion)<25.1 THEN 1
+                    WHEN SUM(precipitacion)>= 25.1 AND SUM(precipitacion)<50.1 THEN 2
+                    WHEN SUM(precipitacion)>= 50.1 AND SUM(precipitacion)<75.1 THEN 3
+                    WHEN SUM(precipitacion)>= 75.1 AND SUM(precipitacion)<150.1 THEN 4
+                    WHEN SUM(precipitacion)>= 150.1 AND SUM(precipitacion)<250.1 THEN 5
+                    WHEN SUM(precipitacion)>=250.1 THEN 6
+                END AS posicion
             FROM estaciones
             INNER JOIN (
                 SELECT id_fk,fecha_hora_precipitacion,precipitacion
                 FROM datos_estaciones
-                WHERE precipitacion>0 AND precipitacion IS NOT NULL AND DATETIME("fecha_hora_precipitacion")>=DATETIME('now','-29 hours')
+                WHERE precipitacion>0 AND precipitacion IS NOT NULL AND DATETIME("fecha_hora_precipitacion")>=DATETIME('{final}')
                 ORDER BY id_fk,DATETIME(fecha_hora_captura)) AS precipitaciones
             ON estaciones.id = precipitaciones.id_fk
             WHERE geom IS NOT NULL
-            GROUP BY id_estacion"""
+            GROUP BY id_estacion
+            ORDER BY posicion DESC,precipitacion DESC""".format(final=final)
         
     try:
         with db.connect(bDatosPath) as con:
@@ -564,11 +582,18 @@ def precipitacionEstandar(inicio,final,archJson):
     except db.Error, e:
         print "Error %s:" % e.args[0]
 
+def fechaFinal():
+    fechaEventoActual = datetime.datetime.now()
+    fechaFinal = datetime.datetime(fechaEventoActual.year, fechaEventoActual.month, fechaEventoActual.day) + datetime.timedelta(hours=8)
+    if fechaEventoActual<fechaFinal:
+        fechaFinal = fechaFinal - datetime.timedelta(hours=24)
+    return fechaFinal 
+
 def ejecutarTodo(final):
     print "Creando GeoJSon Precipitacion"
-    crearGeoJsonPrecipitacion()
+    crearGeoJsonPrecipitacion(final)
     print "Creando JSon Precipitacion"
-    crearJsonPrecipitacion()
+    crearJsonPrecipitacion(final)
     print "Creando Interpolacion"
     crearInterpolacion()
     print "Creando Curvas"
@@ -621,9 +646,7 @@ def ejecutarTodo(final):
             
 if __name__ == '__main__':
     print "inicio"
-    
-    fecha = datetime.datetime.now()
-    final = datetime.datetime(fecha.year, fecha.month, fecha.day) + datetime.timedelta(hours=8)
-    final = ejecutarTodo(final)
+     
+    ejecutarTodo(fechaFinal())
 
     print "fin..........."
