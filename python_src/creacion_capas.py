@@ -552,11 +552,11 @@ def precipitacionEstandar(inicio,final,archJson):
             ON estaciones.id = datos_estaciones.id_fk
             WHERE 
                 precipitacion IS NOT NULL AND 
-                precipitacion > 0 AND  
-                DATETIME(fecha_hora_precipitacion)>=DATETIME('now','{final}')
+                precipitacion > 0 AND
+                DATETIME(fecha_hora_precipitacion)>=DATETIME('{inicio}') AND  
+                DATETIME(fecha_hora_precipitacion)<DATETIME('{final}')
             GROUP BY id_estacion
-            ORDER BY posicion DESC,precipitacion DESC
-            """.format(final=final)
+            ORDER BY posicion DESC,precipitacion DESC""".format(inicio=inicio,final=final)
     
     try:
         with db.connect(bDatosPath) as con:
@@ -602,31 +602,29 @@ def ejecutarTodo(final):
     crearRenderCortePoligonoPNG()
     print "Creando Json Nivel del Agua"
     crearJsonNivelAgua()
-    tiempoActual = datetime.datetime.now()
-    #if tiempoActual>final:
-    if True:                    
-        inicio =  final - datetime.timedelta(days=1)
-        print "Creado 24hr estandar"
-        precipitacionEstandar(inicio,'-29 hours',"procesos/preciptacion_24_estandar.json")
-        inicio =  final - datetime.timedelta(days=2)
-        print "Creado 48hr estandar"
-        precipitacionEstandar(inicio,'-53 hours',"procesos/preciptacion_48_estandar.json")
-        inicio =  final - datetime.timedelta(days=3)
-        print "Creado 72hr estandar"
-        precipitacionEstandar(inicio,'-77 hours',"procesos/preciptacion_72_estandar.json")
-        
-        final =  final + datetime.timedelta(days=1)
-        
-        rutas =[
-                os.path.join(raiz,"procesos/preciptacion_24_estandar.json"),
-                os.path.join(raiz,"procesos/preciptacion_48_estandar.json"),
-                os.path.join(raiz,"procesos/preciptacion_72_estandar.json")
-        ]
-        for r in rutas:
-            if os.path.exists(r):
-                shutil.copy(r,copiarA)
-            else:
-                print "no existe: ",r
+                        
+    inicio =  final - datetime.timedelta(days=1)
+    print "Creado 24hr estandar"
+    precipitacionEstandar(inicio,final,"procesos/preciptacion_24_estandar.json")
+    inicio =  final - datetime.timedelta(days=2)
+    print "Creado 48hr estandar"
+    precipitacionEstandar(inicio,final,"procesos/preciptacion_48_estandar.json")
+    inicio =  final - datetime.timedelta(days=3)
+    print "Creado 72hr estandar"
+    precipitacionEstandar(inicio,final,"procesos/preciptacion_72_estandar.json")
+    
+    final =  final + datetime.timedelta(days=1)
+    
+    rutas =[
+            os.path.join(raiz,"procesos/preciptacion_24_estandar.json"),
+            os.path.join(raiz,"procesos/preciptacion_48_estandar.json"),
+            os.path.join(raiz,"procesos/preciptacion_72_estandar.json")
+    ]
+    for r in rutas:
+        if os.path.exists(r):
+            shutil.copy(r,copiarA)
+        else:
+            print "no existe: ",r
          
     rutas =[
             os.path.join(raiz,"procesos/estaciones_24hr.geojson"),
@@ -646,7 +644,7 @@ def ejecutarTodo(final):
             
 if __name__ == '__main__':
     print "inicio"
-     
+
     ejecutarTodo(fechaFinal())
 
     print "fin..........."
