@@ -5,6 +5,7 @@ p {
 td,
 th {
     text-align: center;
+    font-size: 13px;
 }
 
 tr:hover {

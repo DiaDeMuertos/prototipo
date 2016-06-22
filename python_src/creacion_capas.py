@@ -233,13 +233,15 @@ def tendencia(niveles_agua):
         elif actual<anterior:
             return "disminuyó"
         else:
-            return "sin cambio"
+            return "estable"
 
     return None
     
 def crearJsonNivelAgua():    
     query = """
-        SELECT nombre,estado,corriente,cuenca,prevencion,alerta,emergencia,nivel_agua,tendencia,
+        SELECT nombre,estado,corriente,cuenca,prevencion,alerta,emergencia,nivel_agua,
+            (SELECT nivel_agua FROM datos_estaciones WHERE fecha_hora_nivel_agua=datetime(niveles_agua.fecha_hora_captura,"-24 hours") AND id_fk=niveles_agua.id_fk) AS dia_anterior,
+            tendencia,
             CASE 
                 WHEN  nivel_agua>=prevencion AND nivel_agua<alerta THEN 'prevencion' 
                 WHEN nivel_agua>=alerta AND nivel_agua<emergencia THEN 'alerta' 
@@ -262,7 +264,7 @@ def crearJsonNivelAgua():
                     id_fk,
                     CASE
                         WHEN  total==1 THEN fechas_hora_captura
-                        ELSE SUBSTR(fechas_hora_captura,0,INSTR(niveles_agua,',')) 
+                        ELSE SUBSTR(fechas_hora_captura,0,INSTR(fechas_hora_captura,',')) 
                     END AS fecha_hora_captura,
                     CASE 
                         WHEN total==1 THEN CAST(niveles_agua AS FLOAT)
@@ -270,9 +272,9 @@ def crearJsonNivelAgua():
                     END AS nivel_agua,
                     tendenciaSqlite(niveles_agua) AS tendencia
                 FROM (
-                    SELECT id_fk,GROUP_CONCAT(fecha_hora_captura) AS fechas_hora_captura,GROUP_CONCAT(nivel_agua) AS niveles_agua,COUNT(*) AS total
+                    SELECT id_fk,GROUP_CONCAT(fecha_hora_nivel_agua) AS fechas_hora_captura,GROUP_CONCAT(nivel_agua) AS niveles_agua,COUNT(*) AS total
                     FROM (
-                        SELECT id_fk,fecha_hora_captura,nivel_agua
+                        SELECT id_fk,fecha_hora_nivel_agua,nivel_agua
                         FROM datos_estaciones
                         WHERE nivel_agua IS NOT NULL AND nivel_agua>0 AND  DATETIME(fecha_hora_captura) > DATETIME('now','-3 hours')
                         ORDER BY id_fk,DATETIME(fecha_hora_captura) DESC)
@@ -301,10 +303,11 @@ def crearJsonNivelAgua():
                         "alerta":r[5],
                         "emergencia":r[6],
                         "nivel_agua":r[7],
-                        "tendencia":r[8],
-                        "clasificacion":r[9],
-                        "diferencia":r[10],
-                        "gasto":r[11]                        
+                        "dia_anterior":r[8],
+                        "tendencia":r[9],
+                        "clasificacion":r[10],
+                        "diferencia":r[11],
+                        "gasto":r[12]                        
                 }                
                 listaRegistros.append(d)
             fw = open(os.path.join(raiz,"procesos/niveles_agua_estaciones.json"),"w")
