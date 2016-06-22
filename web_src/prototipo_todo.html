@@ -190,6 +190,7 @@
                             <th class="alerta">Alerta</th>
                             <th class="emergencia">Emergencia</th>
                             <th>Nivel del agua</th>
+                            <th>Tendencia</th>
                             <th>Clasificacion</th>
                             <th>Diferencia</th>
                         </tr>
@@ -574,7 +575,7 @@
                     var th = $('<th scope="row"></th>');
                     th.text(i + 1);
                     th.appendTo(tr);
-                    var columnas = ["nombre", "estado", "corriente", "cuenca", "gasto", "prevencion", "alerta", "emergencia", "nivel_agua", "clasificacion", "diferencia"];
+                    var columnas = ["nombre", "estado", "corriente", "cuenca", "gasto", "prevencion", "alerta", "emergencia", "nivel_agua", "tendencia", "clasificacion", "diferencia"];
                     for (c in columnas) {
                         var columna = columnas[c];
                         // console.log(r[columna]);
@@ -591,7 +592,7 @@
                             } else if (r[columna] == "Río Usumacinta") {
                                 td.attr("class", "cuenca_usumacinta");
                             }
-                        } else if (c == 9) {
+                        } else if (c == 10) {
                             if (r[columna] == "normal") {
                                 td.attr("class", "normal");
                             } else if (r[columna] == "prevencion") {
@@ -601,7 +602,7 @@
                             } else if (r[columna] == "emergencia") {
                                 td.attr("class", "emergencia");
                             }
-                        } else if (c == 10) {
+                        } else if (c == 11) {
                             var numero = r[columna];
                             r[columna] = numero.toFixed(2);
 

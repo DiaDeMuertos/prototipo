@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Created on 17/03/2016
 
@@ -107,7 +108,7 @@ def crearGeoJsonPrecipitacion(final):
                 properties["precipitacion"] = r[4]
                 properties["clasificacion"] = r[5]
                 properties["cambio recientemente"] = r[6]
-#                 desplegarColumnas(properties)
+                # desplegarColumnas(properties)
                 geom = r[7]
                 geomJson = geojson.loads(geom)    
                 feature = geojson.Feature(geometry=geomJson, properties=properties)
@@ -221,74 +222,89 @@ def crearInterpolacion():
     processing.runalg("grass7:v.surf.idw",os.path.join(raiz,"procesos/estaciones_24hr.shp"),numeroDePuntos,2,"precipitac",False,"358437.822632,800904.643622,1586906.09172,2082253.19389",2000,-1.000000,0.000100,os.path.join(raiz,"procesos/interpolacion_24hr.tif"))        
     app.exitQgis()
     app.exit()
-    
-    
+def tendencia(niveles_agua):
+    niveles_agua_split = niveles_agua.split(",")    
+
+    if len(niveles_agua_split)>=2:
+        actual = float(niveles_agua_split[0])
+        anterior = float(niveles_agua_split[1])
+        if actual>anterior:
+            return "aumento"
+        elif actual<anterior:
+            return "disminuyó"
+        else:
+            return "sin cambio"
+
+    return None
     
 def crearJsonNivelAgua():    
     query = """
-            SELECT nombre,estado,corriente,cuenca,prevencion,alerta,emergencia,nivel_agua,
-                CASE 
-                    WHEN  nivel_agua>=prevencion AND nivel_agua<alerta THEN 'prevencion' 
-                    WHEN nivel_agua>=alerta AND nivel_agua<emergencia THEN 'alerta' 
-                    WHEN nivel_agua>=emergencia THEN 'emergencia' 
-                    ELSE 'normal'
-                END AS clasificacion,
-                CASE 
-                    WHEN  nivel_agua>=prevencion AND nivel_agua<alerta THEN prevencion-nivel_agua
-                    WHEN nivel_agua>=alerta AND nivel_agua<emergencia THEN alerta-nivel_agua
-                    WHEN nivel_agua>=emergencia THEN emergencia-nivel_agua
-                    ELSE 0
-                END AS 'deferencia',
-                calcularGastoSqlite(id_estacion,nivel_agua) AS gasto
-            FROM estaciones
-            INNER JOIN escalas_estaciones
-            ON estaciones.id = escalas_estaciones.id_fk
-            LEFT JOIN 
-                    ( 
-                    SELECT 
-                        id_fk,
-                        CASE
-                            WHEN  total==1 THEN fechas_hora_captura
-                            ELSE SUBSTR(fechas_hora_captura,0,INSTR(niveles_agua,',')) 
-                        END AS fecha_hora_captura,
-                        CASE 
-                            WHEN total==1 THEN CAST(niveles_agua AS FLOAT)
-                            ELSE CAST(SUBSTR(niveles_agua,0,INSTR(niveles_agua,',')) AS FLOAT) 
-                        END AS nivel_agua
+        SELECT nombre,estado,corriente,cuenca,prevencion,alerta,emergencia,nivel_agua,tendencia,
+            CASE 
+                WHEN  nivel_agua>=prevencion AND nivel_agua<alerta THEN 'prevencion' 
+                WHEN nivel_agua>=alerta AND nivel_agua<emergencia THEN 'alerta' 
+                WHEN nivel_agua>=emergencia THEN 'emergencia' 
+                ELSE 'normal'
+            END AS clasificacion,
+            CASE 
+                WHEN  nivel_agua>=prevencion AND nivel_agua<alerta THEN prevencion-nivel_agua
+                WHEN nivel_agua>=alerta AND nivel_agua<emergencia THEN alerta-nivel_agua
+                WHEN nivel_agua>=emergencia THEN emergencia-nivel_agua
+                ELSE 0
+            END AS 'deferencia',
+            calcularGastoSqlite(id_estacion,nivel_agua) AS gasto
+        FROM estaciones
+        INNER JOIN escalas_estaciones
+        ON estaciones.id = escalas_estaciones.id_fk
+        LEFT JOIN 
+                ( 
+                SELECT 
+                    id_fk,
+                    CASE
+                        WHEN  total==1 THEN fechas_hora_captura
+                        ELSE SUBSTR(fechas_hora_captura,0,INSTR(niveles_agua,',')) 
+                    END AS fecha_hora_captura,
+                    CASE 
+                        WHEN total==1 THEN CAST(niveles_agua AS FLOAT)
+                        ELSE CAST(SUBSTR(niveles_agua,0,INSTR(niveles_agua,',')) AS FLOAT) 
+                    END AS nivel_agua,
+                    tendenciaSqlite(niveles_agua) AS tendencia
+                FROM (
+                    SELECT id_fk,GROUP_CONCAT(fecha_hora_captura) AS fechas_hora_captura,GROUP_CONCAT(nivel_agua) AS niveles_agua,COUNT(*) AS total
                     FROM (
-                        SELECT id_fk,GROUP_CONCAT(fecha_hora_captura) AS fechas_hora_captura,GROUP_CONCAT(nivel_agua) AS niveles_agua,COUNT(*) AS total
-                        FROM (
-                            SELECT id_fk,fecha_hora_captura,nivel_agua
-                            FROM datos_estaciones
-                            WHERE nivel_agua IS NOT NULL AND nivel_agua>0 AND  DATETIME(fecha_hora_captura) > DATETIME('now','-1 hours')
-                            ORDER BY id_fk,DATETIME(fecha_hora_captura) DESC)
-                        GROUP BY id_fk)
-                    WHERE id_fk IN (SELECT id_fk FROM escalas_estaciones))AS niveles_agua
-            ON escalas_estaciones.id_fk = niveles_agua.id_fk
-            WHERE nombre IS NOT 'Boca del Cerro'
-            ORDER BY grado,nombre ASC"""
-        
+                        SELECT id_fk,fecha_hora_captura,nivel_agua
+                        FROM datos_estaciones
+                        WHERE nivel_agua IS NOT NULL AND nivel_agua>0 AND  DATETIME(fecha_hora_captura) > DATETIME('now','-3 hours')
+                        ORDER BY id_fk,DATETIME(fecha_hora_captura) DESC)
+                    GROUP BY id_fk)
+                WHERE id_fk IN (SELECT id_fk FROM escalas_estaciones))AS niveles_agua
+        ON escalas_estaciones.id_fk = niveles_agua.id_fk
+        WHERE nombre IS NOT 'Boca del Cerro'
+        ORDER BY grado,nombre ASC"""
+
     try:
         with db.connect(bDatosPath) as con:
             con.create_function("calcularGastoSqlite",2,calcularGasto)
+            con.create_function("tendenciaSqlite",1,tendencia)
             cur = con.cursor()
             cur.execute(query)
             data = cur.fetchall()
-            
+
             listaRegistros = []
             for r in data:
                 d = {                     
-                     "nombre":r[0],
-                     "estado":r[1],
-                     "corriente":r[2],
-                     "cuenca":r[3],
-                     "prevencion":r[4],
-                     "alerta":r[5],
-                     "emergencia":r[6],
-                     "nivel_agua":r[7],
-                     "clasificacion":r[8],
-                     "diferencia":r[9],
-                     "gasto":r[10],
+                        "nombre":r[0],
+                        "estado":r[1],
+                        "corriente":r[2],
+                        "cuenca":r[3],
+                        "prevencion":r[4],
+                        "alerta":r[5],
+                        "emergencia":r[6],
+                        "nivel_agua":r[7],
+                        "tendencia":r[8],
+                        "clasificacion":r[9],
+                        "diferencia":r[10],
+                        "gasto":r[11]                        
                 }                
                 listaRegistros.append(d)
             fw = open(os.path.join(raiz,"procesos/niveles_agua_estaciones.json"),"w")
@@ -499,35 +515,35 @@ def calcularGasto(id_estacion,nivel):
     return None 
 
 def precipitacionEstandar(inicio,final,archJson):
-#     query = """   
-#             SELECT id_estacion,tipo,nombre,estado,SUM(precipitacion) AS precipitacion,                
-#                 CASE    
-#                         WHEN SUM(precipitacion)>= 0.1 AND SUM(precipitacion)<25.1 THEN 'lluvias aisladas' 
-#                         WHEN SUM(precipitacion)>= 25.1 AND SUM(precipitacion)<50.1 THEN 'chubascos con tormenta fuertes' 
-#                         WHEN SUM(precipitacion)>= 50.1 AND SUM(precipitacion)<75.1 THEN 'chubascos con tormenta fuertes muy fuertes' 
-#                         WHEN SUM(precipitacion)>= 75.1 AND SUM(precipitacion)<150.1 THEN 'tormentas intensas' 
-#                         WHEN SUM(precipitacion)>= 150.1 AND SUM(precipitacion)<250.1 THEN 'torrenciales'
-#                         WHEN SUM(precipitacion)>=250.1 THEN 'extraordinarios' 
-#                 END AS clasificacion,
-#                 CASE 
-#                         WHEN SUM(precipitacion)>= 0.1 AND SUM(precipitacion)<25.1 THEN 1
-#                         WHEN SUM(precipitacion)>= 25.1 AND SUM(precipitacion)<50.1 THEN 2
-#                         WHEN SUM(precipitacion)>= 50.1 AND SUM(precipitacion)<75.1 THEN 3
-#                         WHEN SUM(precipitacion)>= 75.1 AND SUM(precipitacion)<150.1 THEN 4
-#                         WHEN SUM(precipitacion)>= 150.1 AND SUM(precipitacion)<250.1 THEN 5
-#                         WHEN SUM(precipitacion)>=250.1 THEN 6
-#                 END AS posicion
-#             FROM estaciones
-#             INNER JOIN datos_estaciones
-#             ON estaciones.id = datos_estaciones.id_fk
-#             WHERE 
-#                 precipitacion IS NOT NULL AND 
-#                 precipitacion > 0 AND 
-#                 DATETIME(fecha_hora_precipitacion)>=DATETIME('{inicio}') AND 
-#                 DATETIME(fecha_hora_precipitacion)<DATETIME('{final}')
-#             GROUP BY id_estacion
-#             ORDER BY posicion DESC,precipitacion DESC
-#             """.format(inicio=inicio, final=final)
+    # query = """   
+    #         SELECT id_estacion,tipo,nombre,estado,SUM(precipitacion) AS precipitacion,                
+    #             CASE    
+    #                     WHEN SUM(precipitacion)>= 0.1 AND SUM(precipitacion)<25.1 THEN 'lluvias aisladas' 
+    #                     WHEN SUM(precipitacion)>= 25.1 AND SUM(precipitacion)<50.1 THEN 'chubascos con tormenta fuertes' 
+    #                     WHEN SUM(precipitacion)>= 50.1 AND SUM(precipitacion)<75.1 THEN 'chubascos con tormenta fuertes muy fuertes' 
+    #                     WHEN SUM(precipitacion)>= 75.1 AND SUM(precipitacion)<150.1 THEN 'tormentas intensas' 
+    #                     WHEN SUM(precipitacion)>= 150.1 AND SUM(precipitacion)<250.1 THEN 'torrenciales'
+    #                     WHEN SUM(precipitacion)>=250.1 THEN 'extraordinarios' 
+    #             END AS clasificacion,
+    #             CASE 
+    #                     WHEN SUM(precipitacion)>= 0.1 AND SUM(precipitacion)<25.1 THEN 1
+    #                     WHEN SUM(precipitacion)>= 25.1 AND SUM(precipitacion)<50.1 THEN 2
+    #                     WHEN SUM(precipitacion)>= 50.1 AND SUM(precipitacion)<75.1 THEN 3
+    #                     WHEN SUM(precipitacion)>= 75.1 AND SUM(precipitacion)<150.1 THEN 4
+    #                     WHEN SUM(precipitacion)>= 150.1 AND SUM(precipitacion)<250.1 THEN 5
+    #                     WHEN SUM(precipitacion)>=250.1 THEN 6
+    #             END AS posicion
+    #         FROM estaciones
+    #         INNER JOIN datos_estaciones
+    #         ON estaciones.id = datos_estaciones.id_fk
+    #         WHERE 
+    #             precipitacion IS NOT NULL AND 
+    #             precipitacion > 0 AND 
+    #             DATETIME(fecha_hora_precipitacion)>=DATETIME('{inicio}') AND 
+    #             DATETIME(fecha_hora_precipitacion)<DATETIME('{final}')
+    #         GROUP BY id_estacion
+    #         ORDER BY posicion DESC,precipitacion DESC
+    #         """.format(inicio=inicio, final=final)
     
     query = """   
             SELECT id_estacion,tipo,nombre,estado,SUM(precipitacion) AS precipitacion,                
