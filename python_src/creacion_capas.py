@@ -209,19 +209,19 @@ def crearInterpolacion():
     numeroDePuntos = buscarNumeroDePuntos(stdout)
     print "Numero de puntos en la capa:",numeroDePuntos
      
+    # # app = QgsApplication([],True)
     # app = QgsApplication([],True)
-    app = QgsApplication([],True)
-    app.setPrefixPath(qgisPath, True)
-    app.initQgis()
+    # app.setPrefixPath(qgisPath, True)
+    # app.initQgis()
     
-    sys.path.append("/usr/share/qgis/python/plugins")
-    from processing.core.Processing import Processing
-    Processing.initialize()
-    import processing
+    # sys.path.append("/usr/share/qgis/python/plugins")
+    # from processing.core.Processing import Processing
+    # Processing.initialize()
+    # import processing
 
-    processing.runalg("grass7:v.surf.idw",os.path.join(raiz,"procesos/estaciones_24hr.shp"),numeroDePuntos,2,"precipitac",False,"358437.822632,800904.643622,1586906.09172,2082253.19389",2000,-1.000000,0.000100,os.path.join(raiz,"procesos/interpolacion_24hr.tif"))        
-    app.exitQgis()
-    app.exit()
+    # processing.runalg("grass:v.surf.idw",os.path.join(raiz,"procesos/estaciones_24hr.shp"),numeroDePuntos,2,"precipitac",False,"358437.822632,800904.643622,1586906.09172,2082253.19389",2000,-1.000000,0.000100,os.path.join(raiz,"procesos/interpolacion_24hr.tif"))        
+    # app.exitQgis()
+    # app.exit()
 def tendencia(niveles_agua):
     niveles_agua_split = niveles_agua.split(",")    
 
