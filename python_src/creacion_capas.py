@@ -89,7 +89,7 @@ def crearGeoJsonPrecipitacion(final):
             ON estaciones.id = datos_estaciones.id_fk
             WHERE datos_estaciones.precipitacion>0 AND estaciones.geom IS NOT NULL AND DATETIME("fecha_hora_precipitacion")>=DATETIME('{final}')
             GROUP BY estaciones.id_estacion
-            ORDER BY posicion DESC,precipitacion DESC""".format(final=final)
+            ORDER BY posicion DESC,precipitacion_24hr DESC""".format(final=final)
         
     try:
         with db.connect(bDatosPath) as con:
@@ -152,8 +152,8 @@ def crearJsonPrecipitacion(final):
             ON estaciones.id = precipitaciones.id_fk
             WHERE geom IS NOT NULL
             GROUP BY id_estacion
-            ORDER BY posicion DESC,precipitacion DESC""".format(final=final)
-        
+            ORDER BY posicion DESC,precipitacion_24hr DESC""".format(final=final)
+
     try:
         with db.connect(bDatosPath) as con:
             cur = con.cursor()
