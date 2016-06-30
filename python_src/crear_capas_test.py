@@ -62,22 +62,20 @@ def crearGeoJsonPrecipitacion(final):
             estado,
             SUM(precipitacion) AS precipitacion_24hr ,
             CASE 
-                    WHEN  SUM(precipitacion)>= 0.1 AND SUM(precipitacion)<25.1 THEN 'lluvias aisladas' 
-                    WHEN SUM(precipitacion)>= 25.1 AND SUM(precipitacion)<50.1 THEN 'chubascos con tormenta fuertes' 
-                    WHEN SUM(precipitacion)>= 50.1 AND SUM(precipitacion)<75.1 THEN 'chubascos con tormenta fuertes muy fuertes' 
-                    WHEN SUM(precipitacion)>= 75.1 AND SUM(precipitacion)<150.1 THEN 'tormentas intensas' 
-                    WHEN SUM(precipitacion)>= 150.1 AND SUM(precipitacion)<250.1 THEN 'torrenciales'
-                    WHEN SUM(precipitacion)>=250.1 THEN 'extraordinarios' 
+                WHEN  SUM(precipitacion)>= 0.1 AND SUM(precipitacion)<25 THEN 'lluvia aislada' 
+                WHEN SUM(precipitacion)>= 25 AND SUM(precipitacion)<50 THEN 'chubascos con tormentas fuertes' 
+                WHEN SUM(precipitacion)>= 50 AND SUM(precipitacion)<75 THEN 'chubascos con tormentas muy fuertes' 
+                WHEN SUM(precipitacion)>= 75 AND SUM(precipitacion)<150 THEN 'tormentas intensas' 
+                WHEN SUM(precipitacion)>= 150 THEN 'torrenciales a extraordinarias'
             END AS clasificacion,
             cambioRecientementeSqlite(DATETIME('now','-5 hours','-30 minutes'),GROUP_CONCAT(fecha_hora_precipitacion)) AS cambioRecientemente,
             AsGeoJSON(geom) AS geom_json,
             CASE 
-                WHEN SUM(precipitacion)>= 0.1 AND SUM(precipitacion)<25.1 THEN 1
-                WHEN SUM(precipitacion)>= 25.1 AND SUM(precipitacion)<50.1 THEN 2
-                WHEN SUM(precipitacion)>= 50.1 AND SUM(precipitacion)<75.1 THEN 3
-                WHEN SUM(precipitacion)>= 75.1 AND SUM(precipitacion)<150.1 THEN 4
-                WHEN SUM(precipitacion)>= 150.1 AND SUM(precipitacion)<250.1 THEN 5
-                WHEN SUM(precipitacion)>=250.1 THEN 6
+                WHEN SUM(precipitacion)>= 0.1 AND SUM(precipitacion)<25 THEN 1
+                WHEN SUM(precipitacion)>= 25 AND SUM(precipitacion)<50 THEN 2
+                WHEN SUM(precipitacion)>= 50 AND SUM(precipitacion)<75 THEN 3
+                WHEN SUM(precipitacion)>= 75 AND SUM(precipitacion)<150 THEN 4
+                WHEN SUM(precipitacion)>= 150 THEN 5
                 END AS posicion
             FROM estaciones
             INNER JOIN datos_estaciones
@@ -121,22 +119,20 @@ def crearJsonPrecipitacion(final):
     query = """
             SELECT id_estacion,tipo,nombre,estado,SUM(precipitacion) AS precipitacion_24hr ,
                 CASE 
-                        WHEN  SUM(precipitacion)>= 0.1 AND SUM(precipitacion)<25.1 THEN 'lluvias aisladas' 
-                        WHEN SUM(precipitacion)>= 25.1 AND SUM(precipitacion)<50.1 THEN 'chubascos con tormenta fuertes' 
-                        WHEN SUM(precipitacion)>= 50.1 AND SUM(precipitacion)<75.1 THEN 'chubascos con tormenta fuertes muy fuertes' 
-                        WHEN SUM(precipitacion)>= 75.1 AND SUM(precipitacion)<150.1 THEN 'tormentas intensas' 
-                        WHEN SUM(precipitacion)>= 150.1 AND SUM(precipitacion)<250.1 THEN 'torrenciales'
-                        WHEN SUM(precipitacion)>=250.1 THEN 'extraordinarios' 
+                    WHEN  SUM(precipitacion)>= 0.1 AND SUM(precipitacion)<25 THEN 'lluvia aislada' 
+                    WHEN SUM(precipitacion)>= 25 AND SUM(precipitacion)<50 THEN 'chubascos con tormentas fuertes' 
+                    WHEN SUM(precipitacion)>= 50 AND SUM(precipitacion)<75 THEN 'chubascos con tormentas muy fuertes' 
+                    WHEN SUM(precipitacion)>= 75 AND SUM(precipitacion)<150 THEN 'tormentas intensas' 
+                    WHEN SUM(precipitacion)>= 150 THEN 'torrenciales a extraordinarias'
                 END AS clasificacion,
                 GROUP_CONCAT(fecha_hora_precipitacion) AS fechas,
                 GROUP_CONCAT(precipitacion) AS precipitaciones,
                 CASE 
-                    WHEN SUM(precipitacion)>= 0.1 AND SUM(precipitacion)<25.1 THEN 1
-                    WHEN SUM(precipitacion)>= 25.1 AND SUM(precipitacion)<50.1 THEN 2
-                    WHEN SUM(precipitacion)>= 50.1 AND SUM(precipitacion)<75.1 THEN 3
-                    WHEN SUM(precipitacion)>= 75.1 AND SUM(precipitacion)<150.1 THEN 4
-                    WHEN SUM(precipitacion)>= 150.1 AND SUM(precipitacion)<250.1 THEN 5
-                    WHEN SUM(precipitacion)>=250.1 THEN 6
+                    WHEN SUM(precipitacion)>= 0.1 AND SUM(precipitacion)<25 THEN 1
+                    WHEN SUM(precipitacion)>= 25 AND SUM(precipitacion)<50 THEN 2
+                    WHEN SUM(precipitacion)>= 50 AND SUM(precipitacion)<75 THEN 3
+                    WHEN SUM(precipitacion)>= 75 AND SUM(precipitacion)<150 THEN 4
+                    WHEN SUM(precipitacion)>= 150 THEN 5
                 END AS posicion
             FROM estaciones
             INNER JOIN (
@@ -244,10 +240,10 @@ def crearJsonNivelAgua():
                 ELSE 'normal'
             END AS clasificacion,
             CASE 
-                WHEN  nivel_agua>=prevencion AND nivel_agua<alerta THEN prevencion-nivel_agua
-                WHEN nivel_agua>=alerta AND nivel_agua<emergencia THEN alerta-nivel_agua
-                WHEN nivel_agua>=emergencia THEN emergencia-nivel_agua
-                ELSE 0
+                WHEN  nivel_agua>=prevencion AND nivel_agua<alerta THEN nivel_agua-prevencion
+                WHEN nivel_agua>=alerta AND nivel_agua<emergencia THEN nivel_agua-alerta
+                WHEN nivel_agua>=emergencia THEN nivel_agua-emergencia
+                ELSE nivel_agua-prevencion
             END AS 'deferencia',
             calcularGastoSqlite(id_estacion,nivel_agua) AS gasto
         FROM estaciones
@@ -516,20 +512,18 @@ def precipitacionEstandar(inicio,final,archJson):
     query = """   
             SELECT id_estacion,tipo,nombre,estado,SUM(precipitacion) AS precipitacion,                
                 CASE    
-                        WHEN SUM(precipitacion)>= 0.1 AND SUM(precipitacion)<25.1 THEN 'lluvias aisladas' 
-                        WHEN SUM(precipitacion)>= 25.1 AND SUM(precipitacion)<50.1 THEN 'chubascos con tormenta fuertes' 
-                        WHEN SUM(precipitacion)>= 50.1 AND SUM(precipitacion)<75.1 THEN 'chubascos con tormenta fuertes muy fuertes' 
-                        WHEN SUM(precipitacion)>= 75.1 AND SUM(precipitacion)<150.1 THEN 'tormentas intensas' 
-                        WHEN SUM(precipitacion)>= 150.1 AND SUM(precipitacion)<250.1 THEN 'torrenciales'
-                        WHEN SUM(precipitacion)>=250.1 THEN 'extraordinarios' 
+                    WHEN  SUM(precipitacion)>= 0.1 AND SUM(precipitacion)<25 THEN 'lluvia aislada' 
+                    WHEN SUM(precipitacion)>= 25 AND SUM(precipitacion)<50 THEN 'chubascos con tormentas fuertes' 
+                    WHEN SUM(precipitacion)>= 50 AND SUM(precipitacion)<75 THEN 'chubascos con tormentas muy fuertes' 
+                    WHEN SUM(precipitacion)>= 75 AND SUM(precipitacion)<150 THEN 'tormentas intensas' 
+                    WHEN SUM(precipitacion)>= 150 THEN 'torrenciales a extraordinarias'
                 END AS clasificacion,
                 CASE 
-                        WHEN SUM(precipitacion)>= 0.1 AND SUM(precipitacion)<25.1 THEN 1
-                        WHEN SUM(precipitacion)>= 25.1 AND SUM(precipitacion)<50.1 THEN 2
-                        WHEN SUM(precipitacion)>= 50.1 AND SUM(precipitacion)<75.1 THEN 3
-                        WHEN SUM(precipitacion)>= 75.1 AND SUM(precipitacion)<150.1 THEN 4
-                        WHEN SUM(precipitacion)>= 150.1 AND SUM(precipitacion)<250.1 THEN 5
-                        WHEN SUM(precipitacion)>=250.1 THEN 6
+                    WHEN SUM(precipitacion)>= 0.1 AND SUM(precipitacion)<25 THEN 1
+                    WHEN SUM(precipitacion)>= 25 AND SUM(precipitacion)<50 THEN 2
+                    WHEN SUM(precipitacion)>= 50 AND SUM(precipitacion)<75 THEN 3
+                    WHEN SUM(precipitacion)>= 75 AND SUM(precipitacion)<150 THEN 4
+                    WHEN SUM(precipitacion)>= 150 THEN 5
                 END AS posicion
             FROM estaciones
             INNER JOIN datos_estaciones
