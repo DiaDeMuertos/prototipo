@@ -210,7 +210,7 @@ def crearInterpolacion():
     Processing.initialize()
     import processing
 
-    processing.runalg("grass:v.surf.idw",os.path.join(raiz,"procesos/estaciones_24hr.shp"),numeroDePuntos,2,"precipitac",False,"358437.822632,800904.643622,1586906.09172,2082253.19389",2000,-1.000000,0.000100,os.path.join(raiz,"procesos/interpolacion_24hr.tif"))        
+    processing.runalg("grass7:v.surf.idw",os.path.join(raiz,"procesos/estaciones_24hr.shp"),numeroDePuntos,2,"precipitac",False,"358437.822632,800904.643622,1586906.09172,2082253.19389",2000,-1.000000,0.000100,os.path.join(raiz,"procesos/interpolacion_24hr.tif"))        
     app.exitQgis()
     app.exit()
 def tendencia(niveles_agua):
@@ -272,7 +272,6 @@ def crearJsonNivelAgua():
                     GROUP BY id_fk)
                 WHERE id_fk IN (SELECT id_fk FROM escalas_estaciones))AS niveles_agua
         ON escalas_estaciones.id_fk = niveles_agua.id_fk
-        WHERE nombre IS NOT 'Boca del Cerro'
         ORDER BY grado,nombre ASC"""
 
     try:
