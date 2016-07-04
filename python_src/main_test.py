@@ -29,16 +29,16 @@ class myThread (threading.Thread):
 
         if stderr=="":
             stdout, stderr = subprocess.Popen('python crear_capas_test.py',shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE).communicate()
+
+            archivoStdout = open(os.path.join(raiz,"procesos/stdout_crear_capas.txt"),"w")
+            archivoStdout.write(stdout)    
+            archivoStdout.close()
             
-            if stderr=="":
-                archivoStdout = open(os.path.join(raiz,"procesos/stdout_crear_capas.txt"),"w")
-                archivoStdout.write(stdout)    
-                archivoStdout.close()
-                
-                archivoStderr = open(os.path.join(raiz,"procesos/stderr_crear_capas.txt"),"w")
-                archivoStderr.write(stderr)    
-                archivoStderr.close()
-            else:
+            archivoStderr = open(os.path.join(raiz,"procesos/stderr_crear_capas.txt"),"w")
+            archivoStderr.write(stderr)    
+            archivoStderr.close()
+
+            if stderr!="":
                 print "error en bajar datos ver ",os.path.join(raiz,"procesos/stderr_crear_capas.txt")
         else:
             print "error en bajar datos ver ",os.path.join(raiz,"procesos/stderr_descarga_datos.txt")        
