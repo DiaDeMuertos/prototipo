@@ -22,6 +22,7 @@ nombreBD = "dbMonitoreo.sqlite"
 bDatosPath = os.path.join(os.path.dirname(__file__),"..","bd",nombreBD)
 
 def buscarMaximoMinimo(cadena):
+    print cadena
     max = 0
     min = 0
     for r in cadena.split("\n"):
