@@ -72,3 +72,7 @@ tr:hover {
 .extraordinarios {
     background-color: #08519c;
 }
+
+.desactivado{
+    background-color: #dddddd;
+}
