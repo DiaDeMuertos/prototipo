@@ -21,8 +21,10 @@ copiarA = os.path.join(os.path.dirname(__file__),"..","web_src")
 nombreBD = "dbMonitoreo.sqlite"
 bDatosPath = os.path.join(os.path.dirname(__file__),"..","bd",nombreBD)
 
+def test(cadena):
+    for r in cadena.split("\n"): 
+        print r
 def buscarMaximoMinimo(cadena):
-    print cadena
     max = 0
     min = 0
     for r in cadena.split("\n"):
@@ -187,6 +189,8 @@ def crearInterpolacion():
                                       shell=True,
                                       stdout=subprocess.PIPE,
                                       stderr=subprocess.PIPE).communicate()
+    
+    print " ".join(ogr2ogrInstruccion)
                                                 
     ogrinfoInstruccion = [
                           "ogrinfo",
@@ -197,7 +201,7 @@ def crearInterpolacion():
                                       " ".join(ogrinfoInstruccion),
                                       shell=True,stdout=subprocess.PIPE, 
                                       stderr=subprocess.PIPE).communicate()
-      
+                                      
     numeroDePuntos = buscarNumeroDePuntos(stdout)
     print "Numero de puntos en la capa:",numeroDePuntos
      
@@ -572,12 +576,12 @@ def ejecutarTodo(final):
     crearGeoJsonPrecipitacion(final)
     print "Creando JSon Precipitacion"
     crearJsonPrecipitacion(final)
-    print "Creando Interpolacion"
-    crearInterpolacion()
-    print "Creando Curvas"
-    crearCorteCurvas()
-    print "Creando PNG"
-    crearRenderCortePoligonoPNG()
+    # print "Creando Interpolacion"
+    # crearInterpolacion()
+    # print "Creando Curvas"
+    # crearCorteCurvas()
+    # print "Creando PNG"
+    # crearRenderCortePoligonoPNG()
     print "Creando Json Nivel del Agua"
     crearJsonNivelAgua()
                         
@@ -608,8 +612,8 @@ def ejecutarTodo(final):
             os.path.join(raiz,"procesos/estaciones_24hr.geojson"),
             os.path.join(raiz,"procesos/estaciones_24hr.json"),            
             os.path.join(raiz,"procesos/niveles_agua_estaciones.json"),
-            os.path.join(raiz,"procesos/render_corte_interpolacion_24hr.png"),
-            os.path.join(raiz,"procesos/corte_interpolacion_curvas.geojson"),
+            # os.path.join(raiz,"procesos/render_corte_interpolacion_24hr.png"),
+            # os.path.join(raiz,"procesos/corte_interpolacion_curvas.geojson"),
             os.path.join(raiz,"procesos/fecha.txt")]
     
     for r in rutas:
