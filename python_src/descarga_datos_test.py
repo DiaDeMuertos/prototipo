@@ -101,8 +101,20 @@ def leerArchivoXML(nombreArchivo):
     for d in dcp:
         datos["gasto_operativo"] = separarDatos(limpiarFormatear(validarTomarValor("GO",d)))
         datos["humedad_relativa"] = separarDatos(limpiarFormatear(validarTomarValor("HR",d)))   
-        datos["nivel_agua"] = separarDatos(limpiarFormatear(validarTomarValor("NV",d)))                  
-        datos["precipitacion"] = separarDatos(limpiarFormatear(validarTomarValor("PNE",d)))
+        datos["nivel_agua"] = separarDatos(limpiarFormatear(validarTomarValor("NV",d)))
+        datos["precipitacion"] = separarDatos(limpiarFormatear(validarTomarValor("PNE",d)))        
+        
+        # Fix Tempora-----------------------------------------
+        tempUltimaHora = validarTomarValor("PNES",d)
+        if(tempUltimaHora!="No hay dato"):
+            indiceUltimaHora = tempUltimaHora.find("Ultimas 01 hr:")
+            if(indiceUltimaHora>=0):
+                datos["precipitacion"]["dato"] = tempUltimaHora[indiceUltimaHora:].split(':')[1].strip().split(" ")[0]
+            else:
+                datos["precipitacion"]["dato"] = None
+        else:
+            datos["precipitacion"]["dato"] = None
+        # ----------------------------------------------------    
         datos["velocidad_causal"] = separarDatos(limpiarFormatear(validarTomarValor("VC",d)))
         
         print "Gasto operativo:%s" % datos["gasto_operativo"]
