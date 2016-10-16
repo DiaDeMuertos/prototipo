@@ -239,16 +239,16 @@ def crearJsonNivelAgua():
             (SELECT nivel_agua FROM datos_estaciones WHERE fecha_hora_nivel_agua=datetime(niveles_agua.fecha_hora_captura,"-24 hours") AND id_fk=niveles_agua.id_fk) AS dia_anterior,
             tendencia,
             CASE 
-                WHEN  nivel_agua>=prevencion AND nivel_agua<alerta THEN 'prevencion' 
+                WHEN nivel_agua>=prevencion AND nivel_agua<alerta THEN 'prevencion' 
                 WHEN nivel_agua>=alerta AND nivel_agua<emergencia THEN 'alerta' 
                 WHEN nivel_agua>=emergencia THEN 'emergencia' 
                 ELSE 'normal'
             END AS clasificacion,
             CASE 
-                WHEN  nivel_agua>=prevencion AND nivel_agua<alerta THEN nivel_agua-prevencion
+                WHEN nivel_agua>=prevencion AND nivel_agua<alerta THEN nivel_agua-prevencion
                 WHEN nivel_agua>=alerta AND nivel_agua<emergencia THEN nivel_agua-alerta
                 WHEN nivel_agua>=emergencia THEN nivel_agua-emergencia
-                ELSE nivel_agua-prevencion
+                ELSE nivel_agua-alerta
             END AS 'deferencia',
             calcularGastoSqlite(id_estacion,nivel_agua) AS gasto
         FROM estaciones
@@ -627,7 +627,7 @@ def ejecutarTodo(final):
 if __name__ == '__main__':
     print " "*5 + "inicio crear_capas"
 
-    fechaProceso = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S ciudad de mexico")
+    fechaProceso = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S Ciudad de México")
     archivoFecha = open(os.path.join(raiz,"procesos/fecha.txt"),"w")
     archivoFecha.write(fechaProceso)    
     archivoFecha.close()
