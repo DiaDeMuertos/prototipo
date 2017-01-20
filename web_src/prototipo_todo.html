@@ -608,7 +608,12 @@
                             }
                         } else if (c == 12) {
                             var numero = r[columna];
-                            r[columna] = numero.toFixed(2);
+                            if(numero){
+                                r[columna] = numero.toFixed(2);
+                            }
+                            else{
+                                r[columna]='';
+                            }
 
                         }
                         td.text(r[columna]);
